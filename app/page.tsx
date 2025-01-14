@@ -11,6 +11,7 @@ import Footer from '@/components/footer';
 import ReadingProgress from '@/components/reading-progress';
 
 export default function Home() {
+
   useEffect(() => {
     const sections = document.querySelectorAll('section');
     const navItems = document.querySelectorAll('nav a');
@@ -19,11 +20,9 @@ export default function Home() {
     const handleScroll = () => {
       let current = '';
 
-      // Detectar si estamos en Hero
       if (window.pageYOffset < (heroSection?.offsetHeight || 0) / 3) {
-        current = 'hero'; // Activar Hero si está al principio
+        current = 'hero';
       } else {
-        // Revisar otras secciones
         sections.forEach((section) => {
           const sectionTop = section.offsetTop;
           const sectionHeight = section.clientHeight;
@@ -36,7 +35,6 @@ export default function Home() {
         });
       }
 
-      // Actualizar clases activas del navbar
       navItems.forEach((item) => {
         item.classList.remove('text-accent');
         const href = item.getAttribute('href');
@@ -46,17 +44,15 @@ export default function Home() {
       });
     };
 
-    // Interceptar clics en los enlaces del navbar
     navItems.forEach((item) => {
       item.addEventListener('click', (e) => {
-        e.preventDefault(); // Evitar el comportamiento predeterminado
+        e.preventDefault();
         const href = item.getAttribute('href');
 
         if (href) {
           const target = document.querySelector(href);
           if (target) {
-            // Scroll suave a la sección
-            const headerOffset = 80; // Ajusta según la altura de tu header
+            const headerOffset = 80;
             const elementPosition = target.getBoundingClientRect().top;
             const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
 
@@ -65,8 +61,7 @@ export default function Home() {
               behavior: 'smooth',
             });
 
-            // Actualizar la URL manualmente
-            history.pushState(null, '', href === '#hero' ? '/' : href);
+            history.pushState(null, '', `${window.location.pathname}${window.location.search}${href}`);
           }
         }
       });
@@ -74,7 +69,6 @@ export default function Home() {
 
     window.addEventListener('scroll', handleScroll);
 
-    // Cleanup function
     return () => {
       window.removeEventListener('scroll', handleScroll);
       navItems.forEach((item) => {
@@ -84,7 +78,7 @@ export default function Home() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-primary-foreground pt-20"> {/* pt-20 para compensar el header fijo */}
+    <main className="min-h-screen bg-primary-foreground pt-20">
       <ReadingProgress />
       <Header />
       <Hero />

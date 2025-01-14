@@ -3,20 +3,22 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Menu, X } from 'lucide-react';
-
-const navItems = [
-  { id: 'benefits', label: 'Beneficios' },
-  { id: 'simulator', label: 'Simulador' },
-  { id: 'technologies', label: 'Tecnologías' },
-  { id: 'contact', label: 'Contacto' },
-];
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [activeSection, setActiveSection] = useState('');
-  const [isClickNavigation, setIsClickNavigation] = useState(false); // Nueva variable
+  const [isClickNavigation, setIsClickNavigation] = useState(false);
+  const { language, setLanguage } = useLanguage();
+
+  const navItems = [
+    { id: 'benefits', label: language === 'es' ? 'Beneficios' : 'Benefits' },
+    { id: 'simulator', label: language === 'es' ? 'Simulador' : 'Simulator' },
+    { id: 'technologies', label: language === 'es' ? 'Tecnologías' : 'Technologies' },
+    { id: 'contact', label: language === 'es' ? 'Contacto' : 'Contact' },
+  ];
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
@@ -41,12 +43,12 @@ export default function Header() {
 
   useEffect(() => {
     const handleScroll = () => {
-      if (isClickNavigation) return; // No actualizamos en scroll si fue un clic
+      if (isClickNavigation) return;
 
       const heroElement = document.getElementById('hero');
       if (heroElement && window.scrollY < heroElement.offsetHeight) {
         setActiveSection('');
-        history.replaceState(null, '', '/'); // URL base
+        history.replaceState(null, '', window.location.pathname + window.location.search);
         return;
       }
 
@@ -62,24 +64,24 @@ export default function Header() {
 
       if (currentSection) {
         setActiveSection(currentSection);
-        history.replaceState(null, '', `#${currentSection}`);
+        history.replaceState(null, '', `${window.location.pathname}${window.location.search}#${currentSection}`);
       } else {
-        setActiveSection(''); // Si no hay sección activa
-        history.replaceState(null, '', '/'); // Volvemos a la URL base
+        setActiveSection('');
+        history.replaceState(null, '', window.location.pathname + window.location.search);
       }
     };
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [isClickNavigation]);
+  }, [isClickNavigation, navItems]);
 
   const handleNavClick = (id: string) => {
-    setIsClickNavigation(true); // Marcamos que la navegación es por clic
+    setIsClickNavigation(true);
     setActiveSection(id);
-    history.pushState(null, '', `#${id}`); // Agregamos el hash
+    history.pushState(null, '', `${window.location.pathname}${window.location.search}#${id}`);
 
     setTimeout(() => {
-      setIsClickNavigation(false); // Restauramos tras un pequeño delay
+      setIsClickNavigation(false);
     }, 500);
   };
 
@@ -94,6 +96,25 @@ export default function Header() {
     >
       <div className="container mx-auto px-4 flex justify-between items-center h-16">
         <Link href="/" className="text-2xl font-bold">RaquisVR</Link>
+        
+        <button className="md:hidden" onClick={toggleMenu} aria-label={isMenuOpen ? "Cerrar menú" : "Abrir menú"}>
+          {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
+        <div className="flex items-center ml-4">
+          <button
+            onClick={() => setLanguage('en')}
+            className={`px-2 py-1 ${language === 'en' ? 'font-bold' : ''}`}
+          >
+            EN
+          </button>
+          <span className="mx-1">|</span>
+          <button
+            onClick={() => setLanguage('es')}
+            className={`px-2 py-1 ${language === 'es' ? 'font-bold' : ''}`}
+          >
+            ES
+          </button>
+        </div>
         <nav className="hidden md:block h-full">
           <ul className="flex h-full">
             {navItems.map((item) => (
@@ -119,10 +140,8 @@ export default function Header() {
               </li>
             ))}
           </ul>
+          
         </nav>
-        <button className="md:hidden" onClick={toggleMenu} aria-label={isMenuOpen ? "Cerrar menú" : "Abrir menú"}>
-          {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
       </div>
       {isMenuOpen && (
         <div className="md:hidden">

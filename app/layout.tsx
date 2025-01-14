@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
+import LanguageWrapper from '@/components/LanguageWrapper';
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -18,18 +19,17 @@ export const metadata: Metadata = {
   description: "RaquisVR",
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
+      <LanguageWrapper>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {children}
       </body>
+      </LanguageWrapper>
     </html>
-  );
+  )
 }
+
