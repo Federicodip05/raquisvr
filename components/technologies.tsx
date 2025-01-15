@@ -32,7 +32,7 @@ export default function Technologies() {
         {technologies.map((tech, index) => (
           <div key={index} className={`flex flex-col md:flex-row items-center mb-16 ${index % 2 !== 0 ? 'md:flex-row-reverse' : ''}`}>
             <div className="md:w-1/2 mb-8 md:mb-0">
-              <Image src={tech.image} alt={tech.name} width={300} height={200} className="rounded-lg shadow-lg mx-auto" />
+              <Image src={tech.image} alt={tech.name} width={300} height={200} className="mx-auto" />
             </div>
             <div className="md:w-1/2 md:px-8">
               <h3 className="text-2xl font-bold mb-4 text-primary">{tech.name}</h3>

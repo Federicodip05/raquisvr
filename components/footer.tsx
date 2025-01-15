@@ -10,13 +10,14 @@ export default function Footer() {
           <div className="w-full md:w-1/3 mb-6 md:mb-0">
             <h3 className="text-xl font-bold mb-2">RaquisVR</h3>
             <div className="mt-4">
-              <span className="mx-1">|</span>
+              
               <button
                 onClick={() => setLanguage('en')}
                 className={`px-2 py-1 ${language === 'en' ? 'font-bold' : ''}`}
               >
                 EN
               </button>
+              <span className="mx-1">|</span>
               <button
                 onClick={() => setLanguage('es')}
                 className={`px-2 py-1 ${language === 'es' ? 'font-bold' : ''}`}
@@ -48,7 +49,7 @@ export default function Footer() {
             <h3 className="text-xl font-bold mb-2">
               {language === 'es' ? 'Contacto' : 'Contact'}
             </h3>
-            <p>{language === 'es' ? 'Teléfono' : 'Phone'}: +1 234 567 890</p>
+            <p>{language === 'es' ? 'Mail' : 'Email'}: raquisvr@gmail.com</p>
             <p><a href="https://www.linkedin.com/in/federicodip/" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300">Federico Dip</a></p>
             <p><a href="https://www.linkedin.com/in/maria-eugenia-fontecha/" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300">Eugenia Fontecha</a></p>
           </div>
