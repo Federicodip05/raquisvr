@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, ChevronDown } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function Header() {
@@ -11,15 +11,15 @@ export default function Header() {
   const [lastScrollY, setLastScrollY] = useState(0);
   const [activeSection, setActiveSection] = useState('');
   const [isClickNavigation, setIsClickNavigation] = useState(false);
+  const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
   const { language, setLanguage } = useLanguage();
 
-  const navItems = [
+  const navItems = useMemo(() => [
     { id: 'benefits', label: language === 'es' ? 'Beneficios' : 'Benefits' },
     { id: 'simulator', label: language === 'es' ? 'Simulador' : 'Simulator' },
     { id: 'technologies', label: language === 'es' ? 'Tecnologías' : 'Technologies' },
     { id: 'contact', label: language === 'es' ? 'Contacto' : 'Contact' },
-  ];
-
+  ], [language]);
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
   useEffect(() => {
@@ -80,6 +80,22 @@ export default function Header() {
     setActiveSection(id);
     history.pushState(null, '', `${window.location.pathname}${window.location.search}#${id}`);
 
+    const target = document.getElementById(id);
+    if (target) {
+      const headerOffset = 80;
+      const elementPosition = target.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth',
+      });
+    }
+
+    if (isMenuOpen) {
+      toggleMenu();
+    }
+
     setTimeout(() => {
       setIsClickNavigation(false);
     }, 500);
@@ -97,51 +113,64 @@ export default function Header() {
       <div className="container mx-auto px-4 flex justify-between items-center h-16">
         <Link href="/" className="text-2xl font-bold">RaquisVR</Link>
         
-        <button className="md:hidden" onClick={toggleMenu} aria-label={isMenuOpen ? "Cerrar menú" : "Abrir menú"}>
-          {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
-        <div className="flex items-center ml-4">
-          <button
-            onClick={() => setLanguage('en')}
-            className={`px-2 py-1 ${language === 'en' ? 'font-bold' : ''}`}
+        <div className="flex items-center">
+          <nav className="hidden md:block h-full">
+            <ul className="flex h-full">
+              {navItems.map((item) => (
+                <li key={item.id} className="h-full">
+                  <a
+                    href={`#${item.id}`}
+                    className={`
+                      flex items-center justify-center px-6 h-16 transition-all duration-200
+                      hover:bg-white/10 text-white
+                      ${activeSection === item.id ? 'font-bold' : ''}
+                      relative
+                    `}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleNavClick(item.id);
+                    }}
+                  >
+                    {item.label}
+                    {activeSection === item.id && (
+                      <div className="absolute bottom-0 left-0 w-full h-1 bg-white"></div>
+                    )}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+          
+          <div 
+            className="relative ml-4 h-16 flex items-center"
+            onMouseEnter={() => setIsLangMenuOpen(true)}
+            onMouseLeave={() => setIsLangMenuOpen(false)}
           >
-            EN
-          </button>
-          <span className="mx-1">|</span>
-          <button
-            onClick={() => setLanguage('es')}
-            className={`px-2 py-1 ${language === 'es' ? 'font-bold' : ''}`}
-          >
-            ES
+            <button
+              className="flex items-center justify-center px-4 h-16 text-white hover:bg-white/20 rounded"
+            >
+              {language.toUpperCase()}
+              <ChevronDown className="ml-1" size={16} />
+            </button>
+            {isLangMenuOpen && (
+              <div className="absolute top-[100%] right-0 w-full bg-primary border-t border-white/10">
+                <button
+                  onClick={() => {
+                    setLanguage(language === 'en' ? 'es' : 'en');
+                    setIsLangMenuOpen(false);
+                  }}
+                  className="block w-full px-4 py-2 text-sm text-white hover:bg-white/10 text-left"
+                >
+                  {language === 'en' ? 'ES' : 'EN'}
+                </button>
+              </div>
+            )}
+          </div>
+          
+          <button className="md:hidden ml-4 h-16 flex items-center" onClick={toggleMenu} aria-label={isMenuOpen ? "Cerrar menú" : "Abrir menú"}>
+            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
-        <nav className="hidden md:block h-full">
-          <ul className="flex h-full">
-            {navItems.map((item) => (
-              <li key={item.id} className="h-full">
-                <a
-                  href={`#${item.id}`}
-                  className={`
-                    flex items-center justify-center px-6 h-full transition-all duration-200
-                    hover:bg-white/10 text-white
-                    ${activeSection === item.id ? 'font-bold' : ''}
-                    relative
-                  `}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    handleNavClick(item.id);
-                  }}
-                >
-                  {item.label}
-                  {activeSection === item.id && (
-                    <div className="absolute bottom-0 left-0 w-full h-1 bg-white"></div>
-                  )}
-                </a>
-              </li>
-            ))}
-          </ul>
-          
-        </nav>
       </div>
       {isMenuOpen && (
         <div className="md:hidden">
@@ -177,3 +206,4 @@ export default function Header() {
     </header>
   );
 }
+
